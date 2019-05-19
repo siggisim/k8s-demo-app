@@ -1,0 +1,61 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+load("@io_bazel_rules_docker//go:image.bzl", "go_image")
+load("@io_bazel_rules_docker//container:container.bzl", "container_push", "container_image")
+load("//:version.bzl", "VERSION")
+
+go_library(
+    name = "go_default_library",
+    srcs = ["main.go"],
+    importpath = "github.com/lwolf/k8s-demo-app/cmd/app",
+    visibility = ["//visibility:private"],
+    deps = [
+        "//metrics:go_default_library",
+        "//vendor/github.com/prometheus/client_golang/prometheus/promhttp:go_default_library",
+        "//vendor/github.com/pseidemann/finish:go_default_library",
+        "//vendor/github.com/rs/zerolog:go_default_library",
+        "//vendor/github.com/rs/zerolog/log:go_default_library",
+    ],
+    x_defs = {"Version": VERSION},
+)
+
+go_binary(
+    name = "app",
+    embed = [":go_default_library"],
+    visibility = ["//visibility:public"],
+)
+
+go_image(
+    name = "go_image_base",
+    embed = [":go_default_library"],
+)
+
+container_image(
+    name = "go_image",
+    base = ":go_image_base",
+    ports = ["8000", "8001"],
+)
+
+container_push(
+    name = "push-blue",
+    format = "Docker",
+    image = ":go_image",
+    registry = "index.docker.io",
+    repository = "lwolf/k8s-demo-app",
+    tag = "0.1-blue",
+)
+container_push(
+    name = "push-green",
+    format = "Docker",
+    image = ":go_image",
+    registry = "index.docker.io",
+    repository = "lwolf/k8s-demo-app",
+    tag = "0.1-green",
+)
+container_push(
+    name = "push-purple",
+    format = "Docker",
+    image = ":go_image",
+    registry = "index.docker.io",
+    repository = "lwolf/k8s-demo-app",
+    tag = "0.1-purple",
+)

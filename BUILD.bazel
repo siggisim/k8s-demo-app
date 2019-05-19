@@ -1,0 +1,4 @@
+load("@bazel_gazelle//:def.bzl", "gazelle")
+
+# gazelle:prefix github.com/lwolf/k8s-demo-app
+gazelle(name = "gazelle")

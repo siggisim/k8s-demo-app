@@ -1,0 +1,16 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "go_default_library",
+    srcs = [
+        "base.go",
+        "cbor.go",
+        "decode_stream.go",
+        "string.go",
+        "time.go",
+        "types.go",
+    ],
+    importmap = "github.com/lwolf/k8s-demo-app/vendor/github.com/rs/zerolog/internal/cbor",
+    importpath = "github.com/rs/zerolog/internal/cbor",
+    visibility = ["//vendor/github.com/rs/zerolog:__subpackages__"],
+)
