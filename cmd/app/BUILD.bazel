@@ -36,26 +36,10 @@ container_image(
 )
 
 container_push(
-    name = "push-blue",
+    name = "push",
     format = "Docker",
     image = ":go_image",
     registry = "index.docker.io",
     repository = "lwolf/k8s-demo-app",
-    tag = "0.1-blue",
-)
-container_push(
-    name = "push-green",
-    format = "Docker",
-    image = ":go_image",
-    registry = "index.docker.io",
-    repository = "lwolf/k8s-demo-app",
-    tag = "0.1-green",
-)
-container_push(
-    name = "push-purple",
-    format = "Docker",
-    image = ":go_image",
-    registry = "index.docker.io",
-    repository = "lwolf/k8s-demo-app",
-    tag = "0.1-purple",
+    tag = VERSION,
 )

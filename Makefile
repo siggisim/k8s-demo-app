@@ -29,6 +29,4 @@ clean:
 
 .PHONY: push
 push:
-	bazel run //cmd/app:push-blue
-	bazel run //cmd/app:push-green
-	bazel run //cmd/app:push-purple
+	bazel run //cmd/app:push

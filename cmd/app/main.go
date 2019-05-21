@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"math/rand"
 	"net"
 	"net/http"
 	"os"
@@ -21,12 +22,13 @@ import (
 var (
 	Version   string
 	BuildTime string
-	Hostname  string
 
-	listenAddr  = flag.String("listen.addr", "0.0.0.0:8000", "Address to serve http from")
-	metricsAddr = flag.String("metrics.addr", "0.0.0.0:8001", "Address to serve metrics from")
+	listenAddr   = flag.String("listen.addr", "0.0.0.0:8000", "Address to serve http from")
+	metricsAddr  = flag.String("metrics.addr", "0.0.0.0:8001", "Address to serve metrics from")
 	logsActivity = flag.Bool("logs.activity", false, "Set to produce fake log activity")
-	prettyLogs  = flag.Bool("logs.pretty", true, "")
+	prettyLogs   = flag.Bool("logs.pretty", true, "")
+
+	rng = rand.New(rand.NewSource(time.Now().UnixNano()))
 )
 
 const (
@@ -142,7 +144,7 @@ func requestsHandler(m *metrics.Metrics) http.HandlerFunc {
 		Ips:      getIpAddresses(),
 		Version:  Version,
 	}
-	response, err := json.Marshal(payload)
+	_, err = json.Marshal(payload)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to serialize response")
 	}
@@ -150,14 +152,18 @@ func requestsHandler(m *metrics.Metrics) http.HandlerFunc {
 		log.Info().Str("path", r.URL.Path).Msg("processing request")
 		m.RequestsTotal.Inc()
 		w.Header().Set("Content-Type", "application/json")
-		w.Write(response)
+		w.WriteHeader(500)
 	}
 }
 
 func handleReadiness(w http.ResponseWriter, r *http.Request) {
+	delay := rng.Int63n(60) + 30
+	time.Sleep(time.Duration(delay) * time.Second)
 	fmt.Fprintln(w, "OK")
 }
 
 func handleLiveness(w http.ResponseWriter, r *http.Request) {
+	delay := rng.Int63n(30)
+	time.Sleep(time.Duration(delay) * time.Second)
 	fmt.Fprintln(w, "OK")
 }
