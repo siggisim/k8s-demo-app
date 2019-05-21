@@ -144,7 +144,7 @@ func requestsHandler(m *metrics.Metrics) http.HandlerFunc {
 		Ips:      getIpAddresses(),
 		Version:  Version,
 	}
-	_, err = json.Marshal(payload)
+	response, err := json.Marshal(payload)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to serialize response")
 	}
@@ -152,7 +152,7 @@ func requestsHandler(m *metrics.Metrics) http.HandlerFunc {
 		log.Info().Str("path", r.URL.Path).Msg("processing request")
 		m.RequestsTotal.Inc()
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(500)
+		w.Write(response)
 	}
 }
 
